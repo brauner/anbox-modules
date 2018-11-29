@@ -1,6 +1,6 @@
 ccflags-y += -I$(src) -Wno-int-conversion -DCONFIG_ANDROID_BINDER_DEVICES="\"binder\""
 obj-m := binder_linux.o
-binder_linux-y := deps.o binder.o
+binder_linux-y := deps.o binder.o binderfs.o binder_alloc.o
 
 KERNEL_SRC ?= /lib/modules/$(shell uname -r)/build
 

@@ -1,4 +1,5 @@
 #include <linux/sched.h>
+#include <linux/ipc_namespace.h>
 #include <linux/file.h>
 #include <linux/fdtable.h>
 #include <linux/atomic.h>
@@ -27,6 +28,8 @@ static int (*security_binder_set_context_mgr_ptr)(struct task_struct *mgr) = NUL
 static int (*security_binder_transaction_ptr)(struct task_struct *from, struct task_struct *to) = NULL;
 static int (*security_binder_transfer_binder_ptr)(struct task_struct *from, struct task_struct *to) = NULL;
 static int (*security_binder_transfer_file_ptr)(struct task_struct *from, struct task_struct *to, struct file *file) = NULL;
+static void (*put_ipc_ns_ptr)(struct ipc_namespace *ns) = NULL;
+static void (*mmput_async_ptr)(struct mm_struct* mm) = NULL;
 
 struct vm_struct *get_vm_area(unsigned long size, unsigned long flags)
 {
@@ -139,4 +142,18 @@ int security_binder_transfer_file(struct task_struct *from, struct task_struct *
 	if (!security_binder_transfer_file_ptr)
 		security_binder_transfer_file_ptr = kallsyms_lookup_name("security_binder_transfer_file");
 	return security_binder_transfer_file_ptr(from, to, file);
+}
+
+void put_ipc_ns(struct ipc_namespace *ns)
+{
+	if (!put_ipc_ns_ptr)
+		put_ipc_ns_ptr = kallsyms_lookup_name("put_ipc_ns");
+	put_ipc_ns_ptr(ns);
+}
+
+void mmput_async(struct mm_struct *mm)
+{
+	if (!mmput_async_ptr)
+		mmput_async_ptr = kallsyms_lookup_name("mmput_async");
+	mmput_async_ptr(mm);
 }
